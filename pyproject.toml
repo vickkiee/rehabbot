@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rehabbot"
+version = "0.0.1"
+description = "RehabBot: Mujoco-Based Rehabilitation Environment for Upper-Limb Physiotherapy-Based Reaching Tasks"
+authors = [
+    { name = "Victoria Oguntosin", email = "v.oguntosin@deusto.es" }
+]
+dependencies = [
+    "numpy==1.26.4",
+    "gymnasium>=0.26.0",
+    "mujoco",
+    "robot_descriptions"
+]
+readme = "README.md"
+license = { text = "MIT" }  # Change this if you use a different license
+requires-python = ">=3.7"
+
+[project.urls]
+Homepage = "https://github.com/vickkiee/rehabbot"
+Repository = "https://github.com/vickkiee/rehabbot"
