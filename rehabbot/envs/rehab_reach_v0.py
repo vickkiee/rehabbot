@@ -265,7 +265,7 @@ if __name__ == "__main__":
     if train:
         #model = SAC("MlpPolicy", env, verbose=1, tensorboard_log="./UR5e_tensorboard/") #This line IS TO TRAIN FROM SCRATCH - comment to retrain and uncomment below
         model = SAC.load("v0_DRL_model_SAC", env=env, print_system_info=True, tensorboard_log="./UR5e_tensorboard/") #This line IS TO RETRAIN - comment to train from scratch and uncomment above
-        model.learn(total_timesteps=int(100000), progress_bar=True, reset_num_timesteps=False)
+        model.learn(total_timesteps=int(400000), progress_bar=True, reset_num_timesteps=False)
         model.save("v0_DRL_model_SAC")
     else:
         env = gym.make("rehabbot/rehab-reach-v0", render_mode="human")
