@@ -1,0 +1,499 @@
+<!-- Copyright 2021 DeepMind Technologies Limited
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<mujoco model="Humanoid">
+  <compiler angle="radian" meshdir="assets" autolimits="true" />
+
+  <option integrator="implicitfast"/>
+
+  <visual>
+    <map force="0.1" zfar="30"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global offwidth="2560" offheight="1440" elevation="-20" azimuth="120"/>
+  </visual>
+
+  <statistic center="0 0 0.7"/>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="32" height="512"/>
+    <texture name="body" type="cube" builtin="flat" mark="cross" width="128" height="128" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1"/>
+    <material name="body" texture="body" texuniform="true" rgba="0.8 0.6 .4 1"/>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+    <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
+	
+	<material name="cuff_mat" rgba="0.7 0.7 0.7 0.5" specular="0.3"/>
+	
+	<!-- ur5e -->
+	<material class="ur5e" name="black" rgba="0.033 0.033 0.033 1"/>
+    <material class="ur5e" name="jointgray" rgba="0.278 0.278 0.278 1"/>
+    <material class="ur5e" name="linkgray" rgba="0.82 0.82 0.82 1"/>
+    <material class="ur5e" name="urblue" rgba="0.49 0.678 0.8 1"/>
+
+    <mesh file="base_0.obj"/>
+    <mesh file="base_1.obj"/>
+    <mesh file="shoulder_0.obj"/>
+    <mesh file="shoulder_1.obj"/>
+    <mesh file="shoulder_2.obj"/>
+    <mesh file="upperarm_0.obj"/>
+    <mesh file="upperarm_1.obj"/>
+    <mesh file="upperarm_2.obj"/>
+    <mesh file="upperarm_3.obj"/>
+    <mesh file="forearm_0.obj"/>
+    <mesh file="forearm_1.obj"/>
+    <mesh file="forearm_2.obj"/>
+    <mesh file="forearm_3.obj"/>
+    <mesh file="wrist1_0.obj"/>
+    <mesh file="wrist1_1.obj"/>
+    <mesh file="wrist1_2.obj"/>
+    <mesh file="wrist2_0.obj"/>
+    <mesh file="wrist2_1.obj"/>
+    <mesh file="wrist2_2.obj"/>
+    <mesh file="wrist3.obj"/>
+	
+	
+  </asset>
+
+  <default>
+    <motor ctrlrange="-1 1" forcerange="-150 150"/> 	<!-- I changed ctrlrange from "-1 1" to "-1.54 0.754" and  ctrllimited to "false" -->
+    <default class="body_of_humanoid">
+
+      <!-- geoms -->
+      <geom type="capsule" condim="1" friction=".7" solimp=".9 .99 .003" solref=".015 1" material="body" group="1"/>
+      <default class="thigh">
+        <geom size=".06"/>
+      </default>
+      <default class="shin">
+        <geom fromto="0 0 0 0 0 -.3"  size=".049"/>
+      </default>
+      <default class="foot">
+        <geom size=".027"/>
+        <default class="foot1">
+          <geom fromto="-.07 -.01 0 .14 -.03 0"/>
+        </default>
+        <default class="foot2">
+          <geom fromto="-.07 .01 0 .14  .03 0"/>
+        </default>
+      </default>
+      <default class="arm_upper">
+        <geom size=".04"/>
+      </default>
+      <default class="arm_lower">
+        <geom size=".031"/>
+      </default>
+      <default class="hand">
+        <geom type="sphere" size=".04"/>
+      </default>
+
+      <!-- joints -->
+      <joint type="hinge" damping=".2" stiffness="1" armature=".01" limited="true" solimplimit="0 .99 .01"/>
+      <default class="joint_big">
+        <joint damping="5" stiffness="1000"/> <!-- I changed from the value of 10  -->
+        <default class="hip_x">
+          <joint range="-0.5233 0.1744"/>
+        </default>
+        <default class="hip_z">
+          <joint range="-1.0466 0.6105"/>
+        </default>
+        <default class="hip_y">
+          <joint axis="0 1 0" range="-2.6166 0.3488"/>
+        </default>
+        <default class="joint_big_stiff"> <!-- I changed from the value of 20  -->
+          <joint stiffness="2000"/>
+        </default>
+      </default>
+      <default class="knee">
+        <joint pos="0 0 .02" axis="0 -1 0" range="-2.7911 0.0348"/>
+      </default>
+      <default class="ankle">
+        <joint range="-0.8722 0.8722"/>
+        <default class="ankle_y">
+          <joint pos="0 0 .08" axis="0 1 0" stiffness="6"/>
+        </default>
+        <default class="ankle_x">
+          <joint pos="0 0 .04" stiffness="3"/>
+        </default>
+      </default>
+      <default class="shoulder1">
+        <joint range="-2.617 2.09" stiffness="0"/>
+		<general ctrlrange="-2.617 2.09" gaintype="fixed" biastype="affine" gainprm="300" biasprm="0 -250 -50" forcerange="-1 1" />
+      </default>
+	  <default class="shoulder2">
+        <joint range="-1.4827 2.617" stiffness="0"/>
+		<general ctrlrange="-1.4827 2.617" gaintype="fixed" biastype="affine" gainprm="300" biasprm="0 -250 -50" forcerange="-1 1" />
+      </default>
+      <default class="elbow">
+        <joint range="-1.4827 2.09" stiffness="0"/>
+		<general ctrlrange="-1.4827 2.09" gaintype="fixed" biastype="affine" gainprm="200" biasprm="0 -150 -30" forcerange="-1 1" />
+      </default>
+    </default>
+	
+	<!-- ur5e -->
+	<default class="ur5e">
+      <material specular="0.5" shininess="0.25"/>
+      <joint axis="0 1 0" range="-6.28319 6.28319" armature="0.1"/>
+      <general gaintype="fixed" biastype="affine" ctrlrange="-6.2831 6.2831" gainprm="2000" biasprm="0 -2000 -400" forcerange="-150 150"/>
+      <default class="size3">
+        <default class="size3_limited">
+          <joint range="-3.1415 3.1415"/>
+          <general ctrlrange="-3.1415 3.1415"/>
+        </default>
+      </default>
+      <default class="size1">
+        <general gainprm="500" biasprm="0 -500 -100" forcerange="-28 28"/>
+      </default>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom type="capsule" group="3"/>
+        <default class="eef_collision">
+          <geom type="cylinder"/>
+        </default>
+      </default>
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4"/>
+    </default>
+	
+  </default>
+
+  <worldbody>
+    <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3"/>
+    <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
+    <light name="top" pos="0 0 2" mode="trackcom"/>
+	
+    <body name="torso" pos="0 0 1.282" childclass="body_of_humanoid">
+      <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
+      <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
+	  <!-- <freejoint name="root"/> -->
+      <joint type="free" stiffness="1000" damping="1" frictionloss="0" armature="0"/> <!-- Editing Point -->
+	  
+      <geom name="torso" fromto="0 -.07 0 0 .07 0" size=".07"/>
+      <geom name="waist_upper" fromto="-.01 -.06 -.12 -.01 .06 -.12" size=".06"/>
+      <body name="head" pos="0 0 .19">
+        <geom name="head" type="sphere" size=".09"/>
+        <camera name="egocentric" pos=".09 0 0" xyaxes="0 -1 0 .1 0 1" fovy="80"/>
+      </body>
+      <body name="waist_lower" pos="-.01 0 -.26">
+        <geom name="waist_lower" fromto="0 -.06 0 0 .06 0" size=".06"/>
+        <joint name="abdomen_z" pos="0 0 .065" axis="0 0 1" range="-0.785 0.785" class="joint_big_stiff"/>
+        <joint name="abdomen_y" pos="0 0 .065" axis="0 1 0" range="-1.3083 0.5233" class="joint_big"/>
+        <body name="pelvis" pos="0 0 -.165">
+          <joint name="abdomen_x" pos="0 0 .1" axis="1 0 0" range="-0.61055 0.61055" class="joint_big"/>
+          <geom name="butt" fromto="-.02 -.07 0 -.02 .07 0" size=".09"/>
+          <body name="thigh_right" pos="0 -.1 -.04" euler="0 -89.5 0"> <!-- Editing Point -->
+            <joint name="hip_x_right" axis="1 0 0" class="hip_x"/>
+            <joint name="hip_z_right" axis="0 0 1" class="hip_z"/>
+            <joint name="hip_y_right" class="hip_y"/>
+            <geom name="thigh_right" fromto="0 0 0 0 .01 -.34" class="thigh"/>
+            <body name="shin_right" pos="0 .01 -.4" euler="0 70 0"> <!-- Editing Point -->
+              <joint name="knee_right" class="knee"/>
+              <geom name="shin_right" class="shin"/>
+              <body name="foot_right" pos="0 0 -.39">
+                <joint name="ankle_y_right" class="ankle_y"/>
+                <joint name="ankle_x_right" class="ankle_x" axis="1 0 .5"/>
+                <geom name="foot1_right" class="foot1"/>
+                <geom name="foot2_right" class="foot2"/>
+              </body>
+            </body>
+          </body>
+          <body name="thigh_left" pos="0 .1 -.04" euler="0 -89.5 0" > <!-- Editing Point -->
+            <joint name="hip_x_left" axis="-1 0 0" class="hip_x"/>
+            <joint name="hip_z_left" axis="0 0 -1" class="hip_z"/>
+            <joint name="hip_y_left" class="hip_y" />
+            <geom name="thigh_left" fromto="0 0 0 0 -.01 -.34" class="thigh"/>
+            <body name="shin_left" pos="0 -.01 -.4" euler="0 70 0"> <!-- Editing Point -->
+              <joint name="knee_left" class="knee"/>
+              <geom name="shin_left" fromto="0 0 0 0 0 -.3" class="shin"/>
+              <body name="foot_left" pos="0 0 -.39">
+                <joint name="ankle_y_left" class="ankle_y"/>
+                <joint name="ankle_x_left" class="ankle_x" axis="-1 0 -.5"/>
+                <geom name="foot1_left" class="foot1"/>
+                <geom name="foot2_left" class="foot2"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="upper_arm_right" pos="0 -.17 .06" euler="0 0 0">            <!-- Editing Point (x=-90) -->
+		<site name="shoulder_attach" pos="0 0 0" size="0.01"/>
+        <joint name="shoulder1_right" axis="2 1 1"  class="shoulder1"/>
+        <joint name="shoulder2_right" axis="0 -1 1" class="shoulder2" />
+        <geom name="upper_arm_right" fromto="0 0 0 .16 -.16 -.16" class="arm_upper"/>
+        <body name="lower_arm_right" pos=".18 -.18 -.18" euler="0 0 0">        <!-- Editing Point (z=-45) -->
+		  <site name="elbow_attach" pos="0 0 -0.1" size="0.01"/>
+          <joint name="elbow_right" axis="0 -1 1" class="elbow"/>
+          <geom name="lower_arm_right" fromto=".01 .01 .01 .17 .17 .17" class="arm_lower"/>
+		  
+		  <geom name="insertion_marker" type="sphere" size="0.015" rgba="1 0 0 0.7" pos="0 0 0.1" contype="0" conaffinity="0" /> <!-- Visual guide Position at forearm tip -->
+          <body name="hand_right" pos=".18 .18 .18">
+            <geom name="hand_right" zaxis="1 1 1" class="hand"/>
+			<site name="hand_attach" pos="0 0 0" size="0.01"/>
+          </body>
+        </body>
+		
+		
+		
+		
+      </body>
+      <body name="upper_arm_left" pos="0 .17 .06" euler="0 0 0" > 
+        <joint name="shoulder1_left" axis="-2 1 -1" class="shoulder1"/>
+        <joint name="shoulder2_left" axis="0 -1 -1"  class="shoulder2"/>
+        <geom name="upper_arm_left" fromto="0 0 0 .16 .16 -.16" class="arm_upper"/>
+        <body name="lower_arm_left" pos=".18 .18 -.18">
+          <joint name="elbow_left" axis="0 -1 -1" class="elbow"/>
+          <geom name="lower_arm_left" fromto=".01 -.01 .01 .17 -.17 .17" class="arm_lower"/>
+          <body name="hand_left" pos=".18 -.18 .18">
+            <geom name="hand_left" zaxis="1 -1 1" class="hand"/>
+          </body>
+        </body>
+		
+		
+		
+      </body>
+    </body>
+	
+	<!-- Stool/Sit          -->
+	
+	<body name="Sit">
+      <geom type="box" size="0.25 0.25 0.75" pos="0 0 0" rgba="0 1 0 1" />
+    </body>
+	
+	<body name="leg_rest">
+      <geom type="box" size="0.25 0.25 0.38" pos="0.4 0 0" rgba="0.5 0.5 0.5 1" />
+    </body>
+	
+	<body name="back_rest">
+      <geom type="box" size="0.05 0.25 1.75" pos="-0.25 0 0" rgba="0 0.7 0 1" />
+    </body>
+	
+	
+	
+	<!-- UR5E   START       -->
+	<geom name="ring_floor" type="cylinder" size="0.15 1.25" pos="0 -0.5 0" rgba="0.5 0.5 0.9 1"/>  <!-- size=1.25 is height of robot stand, pos y is distance from humanoid, change pos x -->
+		<body name="base" quat="1 0 0 0" childclass="ur5e" pos="-0.02 -0.5 1.25">							<!-- pos z is height of robot stand, pos y is distance from humanoid, change pos x -->
+      <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072"/>
+      <geom mesh="base_0" material="black" class="visual"/>
+      <geom mesh="base_1" material="jointgray" class="visual"/>
+      <body name="shoulder_link" pos="0 0 0.163">
+        <inertial mass="3.7" pos="0 0 0" diaginertia="0.0102675 0.0102675 0.00666"/>
+        <joint name="shoulder_pan_joint" class="size3" axis="0 0 1"/>
+        <geom mesh="shoulder_0" material="urblue" class="visual"/>
+        <geom mesh="shoulder_1" material="black" class="visual"/>
+        <geom mesh="shoulder_2" material="jointgray" class="visual"/>
+        <geom class="collision" size="0.06 0.06" pos="0 0 -0.04"/>
+        <body name="upper_arm_link" pos="0 0.138 0" quat="1 0 1 0">
+		  <site name="ur5e_upper_arm_attach" pos="0 0 0.2" size="0.01"/>
+          <inertial mass="8.393" pos="0 0 0.2125" diaginertia="0.133886 0.133886 0.0151074"/>
+          <joint name="shoulder_lift_joint" class="size3"/>
+          <geom mesh="upperarm_0" material="linkgray" class="visual"/>
+          <geom mesh="upperarm_1" material="black" class="visual"/>
+          <geom mesh="upperarm_2" material="jointgray" class="visual"/>
+          <geom mesh="upperarm_3" material="urblue" class="visual"/>
+          <geom class="collision" pos="0 -0.04 0" quat="1 1 0 0" size="0.06 0.06"/>
+          <geom class="collision" size="0.05 0.2" pos="0 0 0.2"/>
+          <body name="forearm_link" pos="0 -0.131 0.425">
+			<site name="ur5e_fore_arm_attach" pos="0 0 0.15" size="0.01"/>
+            <inertial mass="2.275" pos="0 0 0.196" diaginertia="0.0311796 0.0311796 0.004095"/>
+            <joint name="elbow_joint" class="size3_limited"/>
+            <geom mesh="forearm_0" material="urblue" class="visual"/>
+            <geom mesh="forearm_1" material="linkgray" class="visual"/>
+            <geom mesh="forearm_2" material="black" class="visual"/>
+            <geom mesh="forearm_3" material="jointgray" class="visual"/>
+            <geom class="collision" pos="0 0.08 0" quat="1 1 0 0" size="0.055 0.06"/>
+            <geom class="collision" size="0.038 0.19" pos="0 0 0.2"/>
+			<!-- Hollow cylinder cuff -->
+			<body name="forearm_cuff" pos="0 0.01 0.15" quat="0.707 0.707 0 0">    
+				<geom name="cuff_outer" type="cylinder" size="0.04 0.08" pos="0 0 0" material="cuff_mat" contype="2" conaffinity="2" solimp="0.9 0.95 0.001" solref="0.01 1" friction="0.7 0.1 0.1" /> <!-- Outer cylinder (collision surface) -->
+				<geom name="cuff_inner" type="cylinder" size="0.03 0.10" pos="0 0 0" rgba="0.3 0.3 0.3 0.2" contype="0" conaffinity="0" />  <!-- Inner hollow space (non-colliding) -->
+			 </body>
+            <body name="wrist_1_link" pos="0 0 0.392" quat="1 0 1 0">
+              <inertial mass="1.219" pos="0 0.127 0" diaginertia="0.0025599 0.0025599 0.0021942"/>
+              <joint name="wrist_1_joint" class="size1"/>
+              <geom mesh="wrist1_0" material="black" class="visual"/>
+              <geom mesh="wrist1_1" material="urblue" class="visual"/>
+              <geom mesh="wrist1_2" material="jointgray" class="visual"/>
+              <geom class="collision" pos="0 0.05 0" quat="1 1 0 0" size="0.04 0.07"/>
+              <body name="wrist_2_link" pos="0 0.127 0">
+                <inertial mass="1.219" pos="0 0 0.1" diaginertia="0.0025599 0.0025599 0.0021942"/>
+                <joint name="wrist_2_joint" axis="0 0 1" class="size1"/>
+                <geom mesh="wrist2_0" material="black" class="visual"/>
+                <geom mesh="wrist2_1" material="urblue" class="visual"/>
+                <geom mesh="wrist2_2" material="jointgray" class="visual"/>
+                <geom class="collision" size="0.04 0.06" pos="0 0 0.04"/>
+                <geom class="collision" pos="0 0.02 0.1" quat="1 1 0 0" size="0.04 0.04"/>
+                <body name="wrist_3_link" pos="0 0 0.1">
+                  <inertial mass="0.1889" pos="0 0.0771683 0" quat="1 0 0 1"
+                    diaginertia="0.000132134 9.90863e-05 9.90863e-05"/>
+                  <joint name="wrist_3_joint" class="size1"/>
+                  <geom material="linkgray" mesh="wrist3" class="visual"/>
+                  <geom class="eef_collision" pos="0 0.08 0" quat="1 1 0 0" size="0.04 0.02"/>
+                  <site name="wrist_attach" pos="0 0.1 0" quat="-1 1 0 0"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+	<!-- UR5E   END       -->
+	
+	
+	
+	
+	
+  </worldbody>
+  
+
+  
+  <equality>
+       <!-- <connect name="upper_arm_connection_link1" active="true" body1="wrist_3_link" body2="hand_right" anchor="0.0 0.0 0.0" solref="0.02 1" solimp="0.8 0.9 0.01"  /> -->
+		<!-- <connect name="upper_arm_connection_link2" active="true" body1="forearm_link" body2="lower_arm_right" anchor="0.0 0.0 0.0"/>  -->
+		<!-- <connect name="upper_arm_connection_link3" active="true" site1="hand_attach" site2="wrist_attach" />    -->
+		
+		<!-- Weld humanoid's right hand to UR5e's wrist_3 -->
+		<!-- <weld body1="wrist_3_link" body2="hand_right" relpose="0 0 0 1 0 0 0"  solref="0.005 0.8"  solimp="0.6 0.8 0.01"    /> -->
+		
+		<!-- Add velocity-dependent damping when inserted -->
+		
+  </equality>
+
+
+  <contact>
+    <exclude body1="waist_lower" body2="thigh_right"/>
+    <exclude body1="waist_lower" body2="thigh_left"/>
+  </contact>
+
+  <tendon>
+    <fixed name="hamstring_right" limited="true" range="-0.3 2">
+      <joint joint="hip_y_right" coef=".5"/>
+      <joint joint="knee_right" coef="-.5"/>
+    </fixed>
+    <fixed name="hamstring_left" limited="true" range="-0.3 2">
+      <joint joint="hip_y_left" coef=".5"/>
+      <joint joint="knee_left" coef="-.5"/>
+    </fixed>
+	
+	
+	
+	<!-- Humanoid Shoulder-to-UpperArm Connection 
+    <spatial name="shoulder_coupling" springlength="0.05" stiffness="8000" damping="15">
+      <site site="shoulder_attach"/>    
+      <site site="ur5e_upper_arm_attach"/>  
+    </spatial>
+	-->
+
+    <!-- Humanoid Elbow-to-Forearm Connection 
+    <spatial name="elbow_coupling" springlength="0.03" stiffness="1000" damping="20">
+      <site site="elbow_attach"/>        
+      <site site="ur5e_fore_arm_attach"/> 
+    </spatial>
+	-->
+	
+	
+	<!-- Spring-like tendon connection 
+    <spatial name="hand_wrist_tendon" springlength="0.01" stiffness="5000" damping="10">
+      <site site="hand_attach"/>
+      <site site="wrist_attach"/>
+    </spatial>
+	-->
+	
+  </tendon>
+
+  <actuator>
+    <motor name="abdomen_z"       gear="1"  joint="abdomen_z"/>
+    <motor name="abdomen_y"       gear="1"  joint="abdomen_y"/>
+    <motor name="abdomen_x"       gear="1"  joint="abdomen_x"/>
+    <motor name="hip_x_right"     gear="1"  joint="hip_x_right"/>
+    <motor name="hip_z_right"     gear="1"  joint="hip_z_right"/>
+    <motor name="hip_y_right"     gear="1" joint="hip_y_right"/>
+    <motor name="knee_right"      gear="1"  joint="knee_right"/>
+    <motor name="ankle_y_right"   gear="1"  joint="ankle_y_right"/>
+    <motor name="ankle_x_right"   gear="1"  joint="ankle_x_right"/>
+    <motor name="hip_x_left"      gear="1"  joint="hip_x_left"/>
+    <motor name="hip_z_left"      gear="1"  joint="hip_z_left"/>
+    <motor name="hip_y_left"      gear="1" joint="hip_y_left"/>
+    <motor name="knee_left"       gear="1"  joint="knee_left"/>
+    <motor name="ankle_y_left"    gear="1"  joint="ankle_y_left"/>
+    <motor name="ankle_x_left"    gear="1"  joint="ankle_x_left"/>
+    <general class="shoulder1" 	name="shoulder1_right"   joint="shoulder1_right"/> <!-- edit -->
+    <general class="shoulder2" 	name="shoulder2_right"   joint="shoulder2_right"/> <!-- edit -->
+    <general class="elbow" 		name="elbow_right"       joint="elbow_right"/> 		<!-- edit -->
+    <motor name="shoulder1_left"  gear="1"  joint="shoulder1_left"/>
+    <motor name="shoulder2_left"  gear="1"  joint="shoulder2_left"/>
+    <motor name="elbow_left"      gear="1"  joint="elbow_left"/>
+	
+	<!-- ur5e  actuator  -->
+	<general class="size3" name="shoulder_pan" joint="shoulder_pan_joint"/>
+    <general class="size3" name="shoulder_lift" joint="shoulder_lift_joint"/>
+    <general class="size3_limited" name="elbow_lift" joint="elbow_joint"/>
+    <general class="size1" name="wrist_1" joint="wrist_1_joint"/>
+    <general class="size1" name="wrist_2" joint="wrist_2_joint"/>
+    <general class="size1" name="wrist_3" joint="wrist_3_joint"/>
+	
+  </actuator>
+
+  <keyframe>
+    <!--
+    The values below are split into rows for readibility:
+      torso position
+      torso orientation
+      spinal
+      right leg
+      left leg
+      arms
+    -->
+    <key name="squat"
+         qpos="0 0 0.596
+               0.988015 0 0.154359 0
+               0 0.4 0
+               -0.25 -0.5 -2.5 -2.65 -0.8 0.56
+               -0.25 -0.5 -2.5 -2.65 -0.8 0.56
+               0 0 0 0 0 0
+			   -1.5708 -1.5708 1.5708 0 0 0"/>
+    <key name="stand_on_left_leg"
+         qpos="0 0 1.21948
+               0.971588 -0.179973 0.135318 -0.0729076
+               -0.0516 -0.202 0.23
+               -0.24 -0.007 -0.34 -1.76 -0.466 -0.0415
+               -0.08 -0.01 -0.37 -0.685 -0.35 -0.09
+               0.109 -0.067 -0.7 -0.05 0.12 0.16
+			   -1.5708 -1.5708 1.5708 0 0 0"/>
+    <key name="prone"
+         qpos="0.4 0 0.0757706
+               0.7325 0 0.680767 0
+               0 0.0729 0
+               0.0077 0.0019 -0.026 -0.351 -0.27 0
+               0.0077 0.0019 -0.026 -0.351 -0.27 0
+               0.56 -0.62 -1.752
+               0.56 -0.62 -1.752
+			   -1.5708 -1.5708 1.5708 0 0 0"/>
+    <key name="supine"
+         qpos="-0.4 0 0.08122
+               0.722788 0 -0.69107 0
+               0 -0.25 0
+               0.0182 0.0142 0.3 0.042 -0.44 -0.02
+               0.0182 0.0142 0.3 0.042 -0.44 -0.02
+               0.186 -0.73 -1.73
+               0.186 -0.73 -1.73
+			   -1.5708 -1.5708 1.5708 0 0 0"/>
+	<key name="sit"
+         qpos="0 0 0.8
+               0 0 0 0
+               0 0 0
+               0 0 -1.8 -1.65 0 0
+               0 0 -1.8 -1.65 0 0
+               0 0 0 0 0 0
+			   -1.5708 -1.5708 1.5708 0 0 0"/>
+  </keyframe>
+</mujoco>
