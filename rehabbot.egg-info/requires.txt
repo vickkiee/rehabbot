@@ -1,0 +1,4 @@
+numpy==1.26.4
+gymnasium>=1.0.0
+mujoco
+robot_descriptions
