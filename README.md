@@ -1,6 +1,7 @@
 # RehabBot: Mujoco-Based Rehabilitation Environment for Upper and Lower Limb Physiotherapy-Based Exercises
 
 ![Rehabilitation Simulation Demo1](demo1.png) 
+![Rehabilitation Simulation Demo1](demo5.png)
 ![Rehabilitation Simulation Demo3](demo3.png)
 ![Rehabilitation Simulation Demo4](demo4.png) 
 
