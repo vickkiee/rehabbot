@@ -4,6 +4,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
+import matplotlib.pyplot as plt
 from skopt.plots import plot_convergence, plot_evaluations
 from skopt import dump
 import numpy as np
@@ -21,33 +22,30 @@ warnings.filterwarnings('ignore')
 # Define hyperparameter search space
 space = [
     Real(1e-5, 1e-3, name='learning_rate', prior='log-uniform'),
-    Categorical(['auto', 'tuned'], name='ent_coef'),  # 'auto' or manual tuning
+    Real(0.001, 0.1, name='ent_coef', prior='log-uniform'),
     Real(0.001, 0.02, name='tau'),
     Integer(10000, 1000000, name='buffer_size'),
     Categorical([32, 64, 128, 256, 512], name='batch_size'),
     Real(0.9, 0.9999, name='gamma'),
     Categorical(['relu', 'tanh', 'elu'], name='activation_fn'),
-    Real(0.1, 10.0, name='target_entropy_scale')  # Scales default target entropy
 ]
 
 @use_named_args(space)
-def objective(learning_rate, ent_coef, tau, buffer_size, batch_size, gamma, activation_fn, target_entropy_scale):
+def objective(learning_rate, ent_coef, tau, buffer_size, batch_size, gamma, activation_fn):
     """
     Objective function to minimize (negative of average reward)
     """
     try:
         # Create environment
         env = make_vec_env('rehabbot/rehab-reach-l-v0', n_envs=1)
-        
-        target_entropy = -target_entropy_scale * np.prod(env.action_space.shape)
+
         
         # Create model with current hyperparameters
         model = SAC(
             'MlpPolicy',
             env,
             learning_rate=learning_rate,
-            ent_coef='auto',
-            target_entropy=target_entropy,
+            ent_coef=ent_coef,
             tau=tau,
             buffer_size=buffer_size,
             batch_size=batch_size,
@@ -60,7 +58,7 @@ def objective(learning_rate, ent_coef, tau, buffer_size, batch_size, gamma, acti
         )
         
         # Train the model
-        model.learn(total_timesteps=100000)
+        model.learn(total_timesteps=300000, progress_bar=True)
         
         # Evaluate performance
         mean_reward, _ = evaluate(model, env)
@@ -70,6 +68,8 @@ def objective(learning_rate, ent_coef, tau, buffer_size, batch_size, gamma, acti
         print(f"Params: LR={learning_rate:.5f}, ent={ent_coef}, "
               f"tau={tau:.4f}, buf={buffer_size}, batch={batch_size}, tar_ent={target_entropy}, "
               f"γ={gamma:.3f}, act={activation_fn} → Reward: {mean_reward:.2f}")
+        
+        #print(np.prod(env.action_space.shape))
         
         # Return negative reward (since we minimize)
         return -mean_reward
@@ -106,19 +106,28 @@ res = gp_minimize(
         acq_func='EI'           # Expected Improvement
     )
 
-plot_convergence(res)
-plot_evaluations(res)
+
+# Create and save plots
+conv_ax = plot_convergence(res)  # Returns Axes object
+conv_fig = conv_ax.get_figure()  # Get the figure from the axes
+conv_fig.savefig("convergence_plot.png")
+plt.close(conv_fig)
+
+eval_ax = plot_evaluations(res)  # Returns Figure and Axes
+eval_fig = eval_ax.get_figure()
+eval_fig.savefig("evaluations_plot.png")
+plt.close(eval_fig)
 
 # Print best results
 print("\n=== Optimization Results ===")
 print(f"Best reward: {-res.fun:.2f}")
 print("Best parameters:")
 print(f"Learning Rate: {res.x[0]:.6f}")
-print(f"Entropy Coef: {res.x[1]}")
+print(f"Entropy Coef: {res.x[1]:.4f}")
 print(f"Tau: {res.x[2]:.4f}")
 print(f"Buffer Size: {res.x[3]}")
 print(f"Batch Size: {res.x[4]}")
 print(f"Gamma: {res.x[5]:.4f}")
 print(f"Activation: {res.x[6]}")
-print(f"Target Entropy scale: {res.x[7]}")
+
 

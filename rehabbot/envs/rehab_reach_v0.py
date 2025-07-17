@@ -290,7 +290,7 @@ if __name__ == "__main__":
         #model.load_replay_buffer("replay_buffer1.pkl")  #This line IS TO RETRAIN
         model.learn(total_timesteps=int(1500000), progress_bar=True, reset_num_timesteps=False)
         model.save("v0_DRL_model_SAC")
-        model.save_replay_buffer("replay_buffer1.pkl")
+        #model.save_replay_buffer("replay_buffer1.pkl")
     else:
         env = gym.make("rehabbot/rehab-reach-v0", render_mode="human")
         model = SAC.load("SAC-1.5M-R-2.5", env=env, print_system_info=True)

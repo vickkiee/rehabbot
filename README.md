@@ -31,7 +31,8 @@ This repository contains a MuJoCo-based simulation environment and Deep Reinforc
 │   │   │   └── TD3_0/					# Tensorboard data for TD3
 │   │   ├── xml/
 │   │   │   ├── assets/					# Assets for UR5e robotic arm model
-│   │   │   ├── human_UR5E2.xml				# RehabBot model for arm exercises
+│   │   │   ├── human_UR5E2.xml				# RehabBot model for one-arm exercises
+│   │   │   ├── human_UR5E2_2arm.xml			# RehabBot model for two-arm exercises
 │   │   │   ├── humanoid_UR5E2.xml			# RehabBot model with the robot rotated 90 degrees about the euler x-axis for arm exercises
 │   │   │   ├── humanoid_CMU.xml			# Humanoid model
 │   │   │   ├── humanoid_UR5E.xml			# RehabBot for hip exercises
@@ -138,7 +139,7 @@ import rehabbot
 env = gym.make("rehabbot/rehab-reach-v0", render_mode=None)
 
 # Load trained policy
-model = SAC.load("v0_DRL_model_SAC", env=env, print_system_info=True)
+model = SAC.load("SAC-1.5M-R-2.5", env=env, print_system_info=True)
 
 # Run evaluation
 mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=5)
@@ -270,13 +271,13 @@ print(f"Mean reward: {mean_reward:.2f}")
 |Body 27:| wrist_3_link of UR5e|
 
 ## Benchmark Results
-| Algorithm | Tracking Error (mm) | Adaptation Gap | 
+| Algorithm | Maximum Reward | Adaptation  | 
 |-----------|----------------------|----------------|
-| SAC | 3.2 ± 0.4 | 14% |
-| TD3 | 4.1 ± 0.7 | 38% |
-| PPO | 5.3 ± 1.2 | 61% | 
+| SAC | 40 ± 0.70 | 93% |
+| TD3 | -188 ± 0.46 | 25% |
+| PPO | -171 ± 0.17 | 36% | 
 
-*Performance at ±50% mass variation (lower values better)*
+*Performance of upper arm mass variation from 0-5kg*
 
 ## Citing This Work
 ```bibtex

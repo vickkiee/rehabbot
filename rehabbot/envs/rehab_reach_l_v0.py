@@ -15,6 +15,7 @@ import mujoco.viewer
 from robot_descriptions import ur5e_mj_description
 import os
 import random
+import torch
 
 from stable_baselines3 import PPO, SAC, TD3
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -285,27 +286,42 @@ if __name__ == "__main__":
     
     
 
-    train = False       #False to visualize
-    #train = True        #True to train/continue training. 
+    #train = False       #False to visualize
+    train = True        #True to train/continue training. 
 
     if train:
-        model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./UR5e_tensorboard/") #This line IS TO TRAIN FROM SCRATCH - comment to retrain and uncomment below
+        #model = SAC("MlpPolicy", env, verbose=1, tensorboard_log="./UR5e_tensorboard/") #This line IS TO TRAIN FROM SCRATCH - comment to retrain and uncomment below
         #model = SAC.load("v1_DRL_model_SAC", env=env, print_system_info=True, tensorboard_log="./UR5e_tensorboard/") #This line IS TO RETRAIN - comment to train from scratch and uncomment above
         #model.load_replay_buffer("replay_buffer2.pkl")  #This line IS TO RETRAIN
-        model.learn(total_timesteps=int(1500000), progress_bar=True, reset_num_timesteps=False)
-        model.save("v1_DRL_model_PPO")
-        model.save_replay_buffer("replay_buffer2.pkl")
+
+        model = SAC(
+            'MlpPolicy',
+            env,
+            learning_rate=0.000102,
+            ent_coef=-6.0,
+            tau=0.0143,
+            buffer_size=1000000,
+            batch_size=32,
+            gamma=0.9825,
+            policy_kwargs=dict(activation_fn=torch.nn.ELU),
+            verbose=1,
+            tensorboard_log="./UR5e_tensorboard/"
+        )
+        model.learn(total_timesteps=int(1000000), progress_bar=True, reset_num_timesteps=False)
+        
+        model.save("SAC_L")
+        #model.save_replay_buffer("replay_buffer2.pkl")
     else:
         env = gym.make("rehabbot/rehab-reach-l-v0", render_mode="human")
-        model = SAC.load("SAC-1M-L-2.5", env=env, print_system_info=True)
-        #model = SAC.load("v1_DRL_model_SAC", env=env, print_system_info=True)
+        #model = SAC.load("SAC-1M-L-2.5", env=env, print_system_info=True)
+        model = SAC.load("SAC_L", env=env, print_system_info=True)
 
 
         print(model.policy)
         
         print("ent_coef: ", model.ent_coef)               # Entropy regularization coefficient
         print("tau: ", model.tau)                         # Target network update rate (polyak averaging)
-        print("target_entropy: ", model.target_entropy)   # Target entropy for automatic tuning
+        #print("target_entropy: ", model.target_entropy)   # Target entropy for automatic tuning
         print("buffer_size: ", model.buffer_size)         # Replay buffer size
         print("batch_size: ", model.batch_size)           # Mini-batch size
         print("gamma: ", model.gamma)                     # Discount factor

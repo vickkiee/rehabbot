@@ -260,12 +260,12 @@ def main():
     all_agent_2_evaluation_rewards = []
     all_agent_3_training_rewards = []
     all_agent_3_evaluation_rewards = []
-    rollouts = 2   # In order to obtain statistical significance (when I use World Models, maybe you don't need it)
+    rollouts = 10   # In order to obtain statistical significance (when I use World Models, maybe you don't need it)
 
     for i in range(rollouts):
         print(f"=== Rollout {i+1}/{rollouts} ===")
         #print("\nTraining SAC agent in RehabBot...")
-        timesteps, agent_1_train_rewards, agent_1_eval_rewards, agent_2_train_rewards, agent_2_eval_rewards, agent_3_train_rewards, agent_3_eval_rewards = train_agents_with_eval(total_timesteps=1500000, eval_interval=50000, num_eval_episodes=50)
+        timesteps, agent_1_train_rewards, agent_1_eval_rewards, agent_2_train_rewards, agent_2_eval_rewards, agent_3_train_rewards, agent_3_eval_rewards = train_agents_with_eval(total_timesteps=1500000, eval_interval=10000, num_eval_episodes=50)
 
         all_agent_1_training_rewards.append(agent_1_train_rewards)
         all_agent_1_evaluation_rewards.append(agent_1_eval_rewards)

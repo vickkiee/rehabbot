@@ -18,7 +18,7 @@ def main():
         'legend.fontsize': 7,    # Legend font size
         'lines.linewidth': 2.0,  # Line width
         'figure.dpi': 300,       # High-resolution output
-        'figure.figsize': (1.0, 0.5),  # Single-column size (inches)
+        'figure.figsize': (0.8, 0.5),  # Single-column size (inches)
         'grid.alpha': 0.3        # Grid transparency
     })
     
@@ -118,7 +118,7 @@ def main():
     #print(SAC_rew_L_step)
     #print(SAC_rew_L_value)
         
-    _, az = plt.subplots(1, 2, sharex=True, figsize=(10, 6))
+    _, az = plt.subplots(1, 2, sharex=True, figsize=(10, 4))
     
         
     # Plot Episode mean length
@@ -155,7 +155,7 @@ def main():
     
 
     
-    _, ay = plt.subplots(1, 2, sharex=True, figsize=(10, 6))
+    _, ay = plt.subplots(1, 2, sharex=True, figsize=(10, 4))
 
     # Plot Episode mean reward
     ay[0].plot(SAC_rew_R_step, SAC_rew_R_value, color="#1f77b4", label="SAC Episode mean reward (RH)", alpha=0.9)  
