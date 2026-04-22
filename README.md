@@ -1,5 +1,94 @@
 # RehabBot: Mujoco-Based Rehabilitation Environment for Upper and Lower Limb Physiotherapy-Based Exercises
 
+RehabBot is an open-source reinforcement learning environment for robot-assisted upper- and lower-limb rehabilitation, built on MuJoCo and Gymnasium.
+
+---
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/vickkiee/rehabbot
+cd rehabbot
+pip install -r requirements.txt
+pip install -e .
+```
+
+---
+
+## Reproducibility
+
+This project provides a reproducible setup with pinned dependencies and deterministic execution.
+
+Run a basic reproducible example:
+
+```bash
+python examples/run_demo.py
+```
+
+This script uses a fixed random seed to ensure consistent results across runs.
+
+---
+
+## Testing
+
+A minimal test suite is provided to validate correct installation and environment behavior.
+
+Run tests with:
+
+```bash
+pytest
+```
+
+---
+
+## Continuous Integration (CI)
+
+Continuous integration is configured using GitHub Actions.  
+On every push or pull request, the following steps are executed automatically:
+
+1. Install dependencies  
+2. Install the package  
+3. Run tests  
+
+This ensures that the codebase remains functional and reproducible across environments.
+
+---
+
+## Requirements
+
+All dependencies are pinned in [requirements] `requirements.txt` to ensure reproducibility.
+
+---
+
+## Usage Example
+
+```python
+import gymnasium as gym
+import rehabbot
+
+env = gym.make("rehabbot/rehab-reach-v0")
+obs, _ = env.reset(seed=0)
+
+for _ in range(100):
+    action = env.action_space.sample()
+    obs, reward, terminated, truncated, _ = env.step(action)
+    if terminated or truncated:
+        break
+
+env.close()
+```
+
+---
+## Environment and description
+| Environment name | description | Maximun rewards | termination conditions |
+|-----------|-------------|-------------|-----------------|
+| rehabbot/rehab-reach-v0 | Robot attached to right arm | 40 | All targets reached |
+| rehabbot/rehab-reach-l-v0 | Robot attached to left arm | 131 | All targets reached |
+
+
+
 ![Rehabilitation Simulation Demo1](demo1.png) 
 ![Rehabilitation Simulation Demo1](demo5.png)
 ![Rehabilitation Simulation Demo3](demo3.png)
