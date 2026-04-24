@@ -58,7 +58,7 @@ This ensures that the codebase remains functional and reproducible across enviro
 
 ## Requirements
 
-All dependencies are pinned in [requirements] `requirements.txt` to ensure reproducibility.
+All dependencies are pinned in `requirements.txt` to ensure reproducibility.
 
 ---
 
