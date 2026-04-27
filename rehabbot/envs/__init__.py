@@ -23,3 +23,15 @@ register(
     entry_point='rehabbot.envs.rehab_reach_m_v0:RehabEnv',
     max_episode_steps=1000,
 )
+
+register(
+    id='rehabbot/rehab-hip-v0',
+    entry_point='rehabbot.envs.rehab_hip_v0:RehabEnv',
+    max_episode_steps=1000,
+)
+
+register(
+    id='rehabbot/rehab-knee-v0',
+    entry_point='rehabbot.envs.rehab_knee_v0:RehabEnv',
+    max_episode_steps=1000,
+)
